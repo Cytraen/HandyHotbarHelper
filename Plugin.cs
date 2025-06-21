@@ -6,6 +6,7 @@ using Dalamud.Interface.Windowing;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game;
+using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using HandyHotbarHelper.Windows;
@@ -115,7 +116,13 @@ public unsafe class Plugin : IDalamudPlugin
 		void ActuallyUpdate()
 		{
 			var atkMgr = RaptureAtkUnitManager.Instance();
-			if (atkMgr == null)
+			var playerState = PlayerState.Instance();
+			if (
+				atkMgr == null
+				|| playerState == null
+				|| Services.ClientState.LocalPlayer?.ClassJob.ValueNullable?.ExpArrayIndex
+					is not { } expArrayIndex
+			)
 			{
 				return;
 			}
@@ -140,7 +147,7 @@ public unsafe class Plugin : IDalamudPlugin
 				.UnionBy(agent->GatheringRoleActionList, x => x.ActionId)
 				.UnionBy(agent->CombatRoleActionList, x => x.ActionId)
 				//.UnionBy(agent->DutyActionList, x => x.ActionId)
-				.Where(x => x.IsSlotable)
+				.Where(x => x.IsSlotable && x.Level <= playerState->ClassJobLevels[expArrayIndex])
 				.ToList();
 
 			foreach (var action in allActionData)

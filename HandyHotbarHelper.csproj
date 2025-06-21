@@ -1,6 +1,11 @@
 ﻿<Project Sdk="Dalamud.NET.Sdk/12.0.2">
 	<PropertyGroup>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<Version>0.1.0</Version>
+		<Version>0.1.1</Version>
 	</PropertyGroup>
+
+	<Target Name="CopyIconToDebugOutput" AfterTargets="Build"
+		Condition="'$(Configuration)' == 'Debug'">
+		<Copy SourceFiles="icon.png" DestinationFolder="$(OutDir)/images/" />
+	</Target>
 </Project>
